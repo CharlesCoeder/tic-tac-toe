@@ -4,14 +4,15 @@ const gameBoard = (() => {
     return {board};
 })();
 
-function playerFactory(char){
+function playerFactory(char, playerName){
     const character = char;
+    const name = playerName;
 
     function selectPiece(index){
         gameBoard.board[index] = character;
     }
 
-    return {selectPiece};
+    return {selectPiece, name};
 }
 
 const displayController = (() => {
@@ -26,8 +27,8 @@ const displayController = (() => {
 
 const gameMaster = (() => {
 
-    const player1 = new playerFactory("x");
-    const player2 = new playerFactory("o");
+    const player1 = new playerFactory("x", "Player One");
+    const player2 = new playerFactory("o", "Player Two");
 
     const players = {player1, player2};
     
@@ -37,7 +38,39 @@ const gameMaster = (() => {
         gameMaster.currentPlayer == 1 ? gameMaster.currentPlayer = 2 : gameMaster.currentPlayer = 1;
     }
 
-    return {currentPlayer, switchPlayer, players};
+    function checkIfWin(){
+        // Rows
+        for (let i = 0; i < 7; i += 3){
+            if ((gameBoard.board[i] == gameBoard.board[i + 1]) && (gameBoard.board[i] == gameBoard.board[i + 2]) && (gameBoard.board[i] != "")){
+                return true;
+            }
+        }
+
+        // Columns
+        for (let i = 0; i < 3; i++){
+            if ((gameBoard.board[i] == gameBoard.board[i + 3]) && (gameBoard.board[i] == gameBoard.board[i + 6]) && (gameBoard.board[i] != "")){
+                return true;
+            }
+        }
+
+        // Diagonals
+        if ((gameBoard.board[0] == gameBoard.board[4]) && (gameBoard.board[0] == gameBoard.board[8]) && (gameBoard.board[0] != "")){
+            return true;
+        }
+        if ((gameBoard.board[2] == gameBoard.board[4]) && (gameBoard.board[2] == gameBoard.board[6]) && (gameBoard.board[2] != "")){
+            return true;
+        }
+
+        // Tie
+        for (let i = 0; i < 9; i++){
+            if (gameBoard.board[i] == ""){
+                return;
+            }
+        }
+        return false;
+    }
+
+    return {currentPlayer, switchPlayer, players, checkIfWin};
 })();
 
 // Creates grid HTML elements
@@ -57,6 +90,9 @@ gridElements.forEach(element => {
     element.addEventListener('click', function(){
         if (element.textContent == ""){
             gameMaster.players['player'+gameMaster.currentPlayer].selectPiece(element.dataset.index);
+            if (gameMaster.checkIfWin() == true){
+                console.log(gameMaster.players['player'+gameMaster.currentPlayer].name);
+            }
             gameMaster.switchPlayer();
             displayController.updateDisplay();
         }
