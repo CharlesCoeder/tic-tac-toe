@@ -55,9 +55,11 @@ for (let i = 0; i < 9; i++){
 const gridElements = document.querySelectorAll('.gridspace');
 gridElements.forEach(element => {
     element.addEventListener('click', function(){
-        gameMaster.players['player'+gameMaster.currentPlayer].selectPiece(element.dataset.index);
-        gameMaster.switchPlayer();
-        displayController.updateDisplay();
+        if (element.textContent == ""){
+            gameMaster.players['player'+gameMaster.currentPlayer].selectPiece(element.dataset.index);
+            gameMaster.switchPlayer();
+            displayController.updateDisplay();
+        }
     });
 });
 
